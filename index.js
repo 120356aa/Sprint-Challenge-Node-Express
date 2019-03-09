@@ -165,4 +165,18 @@ server.put('/api/actions/:id', async (req, res) => {
   }
 });
 
+// GET ALL ACTIONS FOR A PROJECT
+server.get('/api/projects/:id/actions', (req, res) => {
+  const { id } = req.params;
+  projectDB.getProjectActions(id)
+    .then(allActions => {
+      if (!allActions.length) {
+        res.status(404).json({ error: "The actions of the project with the specified ID does not exist."});
+      } else {
+        res.status(200).json(allActions);
+      }
+    })
+    .catch(err => res.status(500).json({ error: "The actions of the projects could not be retrieved" }));
+});
+
 server.listen(4000);
