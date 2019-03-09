@@ -129,13 +129,13 @@ server.delete('/api/actions/:id', async (req, res) => {
 // UPDATE PROJECTS AND ACTIONS BY ID
 server.put('/api/projects/:id', async (req, res) => {
   let { id } = req.params;
-  let changes = req.body;
+  let { name, description, completed } = req.body;
 
   try {
     const project = await projectDB.get(id);
 
     if (project) {
-      await projectDB.update(id, changes);
+      await projectDB.update(id, {name, description, completed });
       res.status(200).json(project);
     } else {
       res.status(400).json({message: 'Could not find project'});
