@@ -79,11 +79,15 @@ server.post('/api/projects', async (req, res) => {
 });
 
 server.post('/api/actions', async (req, res) => {
-  let { notes, description } = req.body;
+  let { project_id, notes, description } = req.body;
 
   try {
-    const newAction = actionsDB.insert({ notes, description });
-    res.status(201).json(newAction);
+    if (project_id && description && notes) {
+      const newAction = actionsDB.insert(req.body);
+      res.status(201).json(newAction);
+    } else {
+      res.status(500).json({error: 'Could not add action.'});
+    }
   } catch (err) {
     res.status(500).json({error: 'Unable to post new action'});
   }
@@ -148,14 +152,18 @@ server.put('/api/projects/:id', async (req, res) => {
 
 server.put('/api/actions/:id', async (req, res) => {
   let { id } = req.params;
-  let { notes, description, completed } = req.body;
+  let { project_id, notes, description } = req.body;
 
   try {
     const action = await actionsDB.get(id);
 
     if (action) {
-      await actionsDB.update(id, { notes, description, completed });
-      res.status(200).json(action);
+      if (project_id && description && notes) {
+        await actionsDB.update(id, req.body);
+        res.status(200).json(action);
+      } else {
+        res.status(400).json({message: 'Could not update the action'})
+      }
     } else {
       res.status(400).json({message: 'Could not find the action'});
     }
